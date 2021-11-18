@@ -1,0 +1,22 @@
+.gallery_title {
+  text-align: center;
+
+  color: #b89393;
+}
+
+.gallery_list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: calc(-1 * 30px);
+  margin-top: calc(-1 * 30px);
+}
+
+.gallery_container {
+  text-align: center;
+}
+
+.button_container {
+  margin-top: 30px;
+  margin-bottom: 40px;
+  text-align: center;
+}
