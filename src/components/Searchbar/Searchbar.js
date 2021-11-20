@@ -1,49 +1,42 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import s from './Searchbar.module.css';
 
-class Searchbar extends Component {
-  state = {
-    searchQuery: '',
-  };
+function Searchbar({ onSubmit }) {
+  const [searchQuery, setSearchQuery] = useState('');
 
-  handleSubmit = e => {
-    const { searchQuery } = this.state;
-
+  function handleSubmit(e) {
     e.preventDefault();
 
-    this.props.onSubmit(searchQuery);
-    this.setState({ searchQuery: '' });
-  };
-
-  handelChange = e => {
-    this.setState({ searchQuery: e.target.value.toLowerCase() });
-  };
-
-  render() {
-    const { searchQuery } = this.state;
-    return (
-      <>
-        <h1>Search images</h1>
-        <form onSubmit={this.handleSubmit}>
-          <label>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={this.handelChange}
-              className={s.search_form}
-              placeholder="Search images..."
-              required
-            />
-          </label>
-          <button type="submit" className={s.search_button}>
-            Search
-          </button>
-        </form>
-      </>
-    );
+    onSubmit(searchQuery);
+    setSearchQuery('');
   }
+
+  function handelChange(e) {
+    setSearchQuery(e.target.value.toLowerCase());
+  }
+
+  return (
+    <>
+      <h1>Search images</h1>
+      <form onSubmit={handleSubmit}>
+        <label>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handelChange}
+            className={s.search_form}
+            placeholder="Search images..."
+            required
+          />
+        </label>
+        <button type="submit" className={s.search_button}>
+          Search
+        </button>
+      </form>
+    </>
+  );
 }
 
 Searchbar.propTypes = {

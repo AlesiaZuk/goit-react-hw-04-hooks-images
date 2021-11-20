@@ -1,12 +1,11 @@
-import { Component } from 'react';
+import { memo } from 'react';
+
 import PropTypes from 'prop-types';
 
 import s from './ImageGalleryItem.module.css';
 
-class ImageGalleryItem extends Component {
-  handleClick = e => {
-    const { toggleModal, onImgClick } = this.props;
-
+function ImageGalleryItem({ img, toggleModal, onImgClick }) {
+  function handleClick(e) {
     e.preventDefault();
 
     if (e.target.nodeName === 'IMG') {
@@ -17,34 +16,30 @@ class ImageGalleryItem extends Component {
       toggleModal();
       onImgClick(img);
     }
-  };
-
-  render() {
-    const { img } = this.props;
-
-    return img.map(item => {
-      return (
-        <li className={s.gallery_item} key={item.id}>
-          <div>
-            <a
-              href={item.largeImageURL}
-              className={s.gallery_link}
-              onClick={this.handleClick}
-            >
-              <img
-                src={item.webformatURL}
-                alt={item.tags}
-                width="370px"
-                height="250px"
-                className={s.gallery_image}
-                data-source={item.largeImageURL}
-              />
-            </a>
-          </div>
-        </li>
-      );
-    });
   }
+
+  return img.map(item => {
+    return (
+      <li className={s.gallery_item} key={item.id}>
+        <div>
+          <a
+            href={item.largeImageURL}
+            className={s.gallery_link}
+            onClick={handleClick}
+          >
+            <img
+              src={item.webformatURL}
+              alt={item.tags}
+              width="370px"
+              height="250px"
+              className={s.gallery_image}
+              data-source={item.largeImageURL}
+            />
+          </a>
+        </div>
+      </li>
+    );
+  });
 }
 
 ImageGalleryItem.propTypes = {
@@ -53,4 +48,4 @@ ImageGalleryItem.propTypes = {
   onImgClick: PropTypes.func.isRequired,
 };
 
-export default ImageGalleryItem;
+export default memo(ImageGalleryItem);

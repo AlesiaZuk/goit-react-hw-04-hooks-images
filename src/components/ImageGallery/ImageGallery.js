@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import fetchImage from '../../api/img-api.js';
@@ -15,124 +15,108 @@ const Status = {
   REJECTED: 'rejected',
 };
 
-class ImageGallery extends Component {
-  state = {
-    img: [],
-    page: 2,
-    error: null,
-    showButton: false,
-    status: Status.IDLE,
-  };
+function ImageGallery({
+  searchQuery,
+  toggleModal,
+  onImgClick,
+  page,
+  handelClick,
+}) {
+  const [img, setImg] = useState([]);
+  const [showButton, setShowButton] = useState(false);
+  const [status, setStatus] = useState(Status.IDLE);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { page } = this.state;
-    const prevName = prevProps.searchQuery;
-    const nextName = this.props.searchQuery;
-
-    if (prevName !== nextName) {
-      this.setState({
-        img: [],
-        page: 2,
-        status: Status.PENDING,
-      });
+  const fetchGallery = useCallback(() => {
+    if (!searchQuery) {
+      return;
     }
-    if (prevName !== nextName || prevState.page !== page) {
-      this.fetchGallery(nextName, page);
-    }
-  }
-
-  handelClick = () => {
-    this.pageIncrement();
-
-    // this.fetchGallery(this.props.searchQuery, page);
-  };
-
-  fetchGallery = (searchQuery, page) => {
     fetchImage(searchQuery, page).then(data => {
       if (data.hits.length > 0) {
-        this.setState({
-          img: [
-            ...this.state.img,
+        setImg(prevImg => {
+          return [
+            ...prevImg,
             ...data.hits.map(item => {
               const image = {};
-              image.id = item.id;
+              image.id = item.webformatURL;
               image.largeImageURL = item.largeImageURL;
               image.webformatURL = item.webformatURL;
               image.tags = item.tags;
               return image;
             }),
-          ],
-          status: Status.RESOLVED,
+          ];
         });
 
-        this.showLoaderButton(data);
+        setStatus(Status.RESOLVED);
+
+        showLoaderButton(data);
       } else {
-        this.setState({
-          error: `No image with keyword ${searchQuery}`,
-          status: Status.REJECTED,
-        });
+        setStatus(Status.REJECTED);
       }
     });
-  };
+  }, [searchQuery, page]);
 
-  showLoaderButton = data => {
+  useEffect(() => {
+    setImg([]);
+    setStatus(Status.IDLE);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      return;
+    }
+    setStatus(Status.PENDING);
+
+    fetchGallery();
+  }, [fetchGallery, searchQuery]);
+
+  function showLoaderButton(data) {
     if (data.totalHits > 12 && data.hits.length === 12) {
-      this.showButton(true);
+      setShowButton(true);
     } else {
-      this.showButton(false);
+      setShowButton(false);
     }
-  };
+  }
 
-  showButton = showButton => {
-    this.setState({ showButton });
-  };
+  if (status === 'idle') {
+    return <h2 className={s.gallery_title}>Enter a keyword...</h2>;
+  }
 
-  pageIncrement = () => {
-    const { page } = this.state;
-    this.setState({ page: page + 1 });
-  };
+  if (status === 'pending') {
+    return (
+      <div className={s.gallery_container}>
+        <LoaderSpinner></LoaderSpinner>;
+      </div>
+    );
+  }
 
-  render() {
-    const { toggleModal, onImgClick } = this.props;
-    const { img, error, status, showButton } = this.state;
+  if (status === 'rejected') {
+    return (
+      <h2
+        className={s.gallery_title}
+      >{`No image with keyword ${searchQuery}`}</h2>
+    );
+  }
 
-    if (status === 'idle') {
-      return <h2 className={s.gallery_title}>Enter a keyword...</h2>;
-    }
+  if (status === 'resolved') {
+    return (
+      <>
+        <section>
+          <ul className={s.gallery_list}>
+            <ImageGalleryItem
+              img={img}
+              toggleModal={toggleModal}
+              onImgClick={onImgClick}
+            ></ImageGalleryItem>
+          </ul>
+        </section>
 
-    if (status === 'pending') {
-      return (
-        <div className={s.gallery_container}>
-          <LoaderSpinner></LoaderSpinner>;
-        </div>
-      );
-    }
-
-    if (status === 'rejected') {
-      return <h2 className={s.gallery_title}>{error}</h2>;
-    }
-
-    if (status === 'resolved') {
-      return (
-        <>
-          <section>
-            <ul className={s.gallery_list}>
-              <ImageGalleryItem
-                img={img}
-                toggleModal={toggleModal}
-                onImgClick={onImgClick}
-              ></ImageGalleryItem>
-            </ul>
-          </section>
-
-          {showButton && (
-            <div className={s.button_container}>
-              <Button handelClick={this.handelClick}></Button>
-            </div>
-          )}
-        </>
-      );
-    }
+        {showButton && (
+          <div className={s.button_container}>
+            <Button handelClick={handelClick}></Button>
+          </div>
+        )}
+      </>
+    );
   }
 }
 
