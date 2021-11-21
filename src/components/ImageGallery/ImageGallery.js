@@ -102,11 +102,16 @@ function ImageGallery({
       <>
         <section>
           <ul className={s.gallery_list}>
-            <ImageGalleryItem
-              img={img}
-              toggleModal={toggleModal}
-              onImgClick={onImgClick}
-            ></ImageGalleryItem>
+            {img.map(item => {
+              return (
+                <ImageGalleryItem
+                  key={item.id}
+                  img={item}
+                  toggleModal={toggleModal}
+                  onImgClick={onImgClick}
+                ></ImageGalleryItem>
+              );
+            })}
           </ul>
         </section>
 
