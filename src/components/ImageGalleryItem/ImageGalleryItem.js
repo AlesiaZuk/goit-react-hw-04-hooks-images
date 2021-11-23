@@ -5,15 +5,13 @@ import PropTypes from 'prop-types';
 import s from './ImageGalleryItem.module.css';
 
 function ImageGalleryItem({ img, toggleModal, onImgClick }) {
-  function handleClick(e) {
-    // e.preventDefault();
-
+  function handleClick() {
     const imgModal = {};
-    imgModal.largeImageURL = e.target.dataset.source;
-    imgModal.alt = e.target.alt;
+    imgModal.url = img.largeImageURL;
+    imgModal.alt = img.tags;
 
     toggleModal();
-    onImgClick(img);
+    onImgClick(imgModal);
   }
 
   return (
@@ -25,7 +23,6 @@ function ImageGalleryItem({ img, toggleModal, onImgClick }) {
           width="370px"
           height="250px"
           className={s.gallery_image}
-          data-source={img.largeImageURL}
           onClick={handleClick}
         />
       </div>

@@ -11,7 +11,7 @@ const image = ['image'];
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [imgModal, setImgModal] = useState('');
+  const [imgModal, setImgModal] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -52,11 +52,7 @@ function App() {
       </main>
       {showModal && (
         <Modal onClose={toggleModal}>
-          <img
-            src={imgModal.largeImageURL}
-            alt={imgModal.alt}
-            className={image}
-          />
+          <img src={imgModal.url} alt={imgModal.alt} className={image} />
         </Modal>
       )}
     </>
